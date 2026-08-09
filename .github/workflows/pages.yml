@@ -1,0 +1,79 @@
+name: Deploy privacy policy to Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Validate static policy
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          expected=$'index.html\nstyles.css'
+          actual="$(find site -type f -printf '%P\n' | LC_ALL=C sort)"
+          if [[ "$actual" != "$expected" ]]; then
+            printf 'site/ must contain exactly index.html and styles.css; found:\n%s\n' "$actual" >&2
+            exit 1
+          fi
+
+          for required in \
+            'Retro Games Mobile' \
+            'dev.thefunkybits.rgm' \
+            'The Funky Bits' \
+            'thefunkybits@gmail.com' \
+            'href="styles.css"'; do
+            grep -Fq "$required" site/index.html
+          done
+
+          if grep -Eiq 'TODO|TBD|REPLACE|example\.invalid|localhost|C:\\Users\\' site/index.html site/styles.css; then
+            echo 'Site contains a placeholder or private machine path.' >&2
+            exit 1
+          fi
+
+          if grep -Eiq '<(script|iframe|form)([[:space:]>])' site/index.html; then
+            echo 'Executable or interactive embedded content is not allowed.' >&2
+            exit 1
+          fi
+
+          if grep -Eiq "(src|poster)[[:space:]]*=[[:space:]]*[\"']https?://|@import|url\([[:space:]]*[\"']?https?://" site/index.html site/styles.css; then
+            echo 'Remote embedded assets are not allowed.' >&2
+            exit 1
+          fi
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
