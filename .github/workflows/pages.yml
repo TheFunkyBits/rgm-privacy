@@ -30,7 +30,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Validate static policy
+      - name: Validate compatibility redirect
         shell: bash
         run: |
           set -euo pipefail
@@ -44,9 +44,9 @@ jobs:
 
           for required in \
             'Retro Games Mobile' \
-            'dev.thefunkybits.rgm' \
-            'The Funky Bits' \
-            'thefunkybits@gmail.com' \
+            'http-equiv="refresh" content="0; url=https://thefunkybits.github.io/rgm/privacy/"' \
+            'rel="canonical" href="https://thefunkybits.github.io/rgm/privacy/"' \
+            'href="https://thefunkybits.github.io/rgm/privacy/"' \
             'href="styles.css"'; do
             grep -Fq "$required" site/index.html
           done

@@ -1,16 +1,15 @@
 # Retro Games Mobile privacy policy
 
-This public repository contains the privacy policy for the Android application
-Retro Games Mobile (`dev.thefunkybits.rgm`).
+This public repository preserves the original privacy-policy URL for the Android application
+Retro Games Mobile (`dev.thefunkybits.rgm`). Its static page redirects to the unified RGM site.
 
 The canonical policy URL is:
 
-<https://thefunkybits.github.io/rgm-privacy/>
+<https://thefunkybits.github.io/rgm/privacy/>
 
-The deployable source is deliberately limited to `site/index.html` and
-`site/styles.css`. A GitHub Actions workflow validates those files and publishes
-them to GitHub Pages. The page contains no JavaScript, analytics, forms, remote
-media, or application-operated service.
+The compatibility URL remains <https://thefunkybits.github.io/rgm-privacy/>. The deployable
+source is limited to a static redirect and styles. A GitHub Actions workflow validates those
+files and publishes them to GitHub Pages.
 
 ## Local preview
 
